@@ -24,6 +24,13 @@
                             ></v-text-field>
                             
                             <v-text-field
+                                v-model="name"
+                                
+                                label="Name"
+                                required
+                            ></v-text-field> 
+
+                            <v-text-field
                                 v-model="password"
                                 :rules="passwordRules"
                                 label="Password"
@@ -64,10 +71,12 @@
 
 <script>
 
+
 export default {
 data () {
     return {
     email: '',
+    name:'',
     show1: false,
     show2: true,
     show3: false,
@@ -102,7 +111,8 @@ methods:{
             this.snackbar = true
            const user = {
             email: this.email,
-            password: this.password
+            password: this.password,
+            name: this.name
         }
  
             this.$store.dispatch('register', user)

@@ -89,7 +89,7 @@ methods:{
             this.$store.dispatch('login', user)
             if(this.$store.getters.error == null ){
                 // if login not err
-                this.$router.push({ path: '/dashboard' })
+                this.$router.push({ path: '/dashboard' }).catch()
             }
           }
     },

@@ -4,7 +4,11 @@ import './registerServiceWorker'
 import router from './router'
 import store from './store'
 import vuetify from './plugins/vuetify';
-import firebase from 'firebase/app';
+import './firebase-app'
+import { firestorePlugin } from 'vuefire'
+import { firebaseAuth } from './firebase-app'
+
+
 
 Vue.config.productionTip = false
 
@@ -15,12 +19,17 @@ new Vue({
   render: h => h(App)
 }).$mount('#app')
 
-var config = {
-  apiKey: process.env.VUE_APP_FIREBASE_API_KEY,
-  authDomain: process.env.VUE_APP_FIREBASE_AUTH_DOMAIN,
-  databaseURL: process.env.VUE_APP_FIREBASE_DATABASE_URL,
-  projectId: process.env.VUE_APP_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.VUE_APP_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.VUE_APP_FIREBASE_MESSAGING_SENDER_ID
-}
-firebase.initializeApp(config)
+Vue.use(firestorePlugin)
+
+// Vue.$store.dispatch('isLoggedIn')
+firebaseAuth().onAuthStateChanged(function(user) {
+  if (user) {
+    // console.log(user)
+    store.dispatch('autoLogin', user)
+    router.push('/dashboard')
+  } else {
+    // No user is signed in.
+    // router.push('/login')
+
+  }
+});

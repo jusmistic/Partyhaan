@@ -75,6 +75,10 @@
     },
       logout(){
         this.$store.dispatch('logout')
+        if(this.$store.getters.error == null ){
+              // if login not err
+              this.$router.push({ path: '/login' }).catch()
+          }
     }
     
     }

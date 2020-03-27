@@ -1,19 +1,23 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import * as firebase from 'firebase/app';
-import 'firebase/auth';
+// import firebase from 'firebase/app';
+// import 'firebase/auth';
+import {firebaseAuth, firebaseDb} from '../firebase-app'
 
 Vue.use(Vuex)
+let auth = firebaseAuth
+let db = firebaseDb
 
 export default new Vuex.Store({
   state: {
     user: null,
     status:null,
     error: null,
-    isLoggedin: false,
+    name: null,
   },
   mutations: {
     setUser(state, user){
+      // console.log(user)
       state.user = user
     },
     removeUser(state){
@@ -25,23 +29,34 @@ export default new Vuex.Store({
     setError(state, payload){
       state.error = payload
     },
-    setIsLoggedin(state, payload){
-      state.isLoggedin = payload
-    }
   },
   actions: {
+
     register ({commit}, payload) {
       commit("setStatus", "Loading")
       commit("setError", null)
 
-      firebase.auth().createUserWithEmailAndPassword(payload.email, payload.password)
+      auth().createUserWithEmailAndPassword(payload.email, payload.password)
       .then((response) => {
+      let user = response.user
       // Register success
-      commit('setUser', response.user.uid)
+      commit('setUser', user)
       commit('setStatus', 'Success')
       commit('setError', null)
-      console.log(response)
+
+      // create profile in firestore
+      commit('setStatus', 'Loading')
+      db.collection('users')
+      .doc(user.uid)
+      .set({'uid':user.uid,'partys':[]})
+      .then(() => {
+        commit('setStatus', 'User updated in firestore')
+        commit('setError', null)      })
+      
+      return response.user.updateProfile({
+        displayName: payload.name
       })
+    })
       .catch((error) => {
         commit('setStatus', 'Failure')
         commit('setError', error.message)
@@ -51,9 +66,9 @@ export default new Vuex.Store({
   login({commit}, payload) {
     commit("setStatus", "Loading")
     commit("setError", null)
-    firebase.auth().signInWithEmailAndPassword(payload.email, payload.password)
+    auth().signInWithEmailAndPassword(payload.email, payload.password)
         .then((response) => {
-          commit('setUser', response.user.uid)
+          commit('setUser', response.user)
           commit('setStatus', 'Success')
           commit('setError', null)
           console.log(response)
@@ -65,7 +80,7 @@ export default new Vuex.Store({
         })
   },
   logout ( {commit}) {
-    firebase.auth().signOut()
+    auth().signOut()
       .then(() => {
         commit('setUser', null)
         commit('setStatus', 'success')
@@ -75,6 +90,10 @@ export default new Vuex.Store({
         commit('setStatus', 'failure')
         commit('setError', error.message)
       })
+  },
+  autoLogin({commit}, payload){
+    // console.log('autoLogin')
+    commit('setUser', payload)
   },
     
   },
@@ -88,8 +107,8 @@ export default new Vuex.Store({
     error(state){
       return state.error
     },
-    isLoggedin(state){
-      return state.error
+    name(state){
+      return state.name
     }
   },
   modules: {
