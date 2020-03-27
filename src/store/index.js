@@ -17,7 +17,6 @@ export default new Vuex.Store({
   },
   mutations: {
     setUser(state, user){
-      // console.log(user)
       state.user = user
     },
     removeUser(state){
@@ -60,7 +59,6 @@ export default new Vuex.Store({
       .catch((error) => {
         commit('setStatus', 'Failure')
         commit('setError', error.message)
-      console.log(error)
       })
   },
   login({commit}, payload) {
@@ -71,12 +69,10 @@ export default new Vuex.Store({
           commit('setUser', response.user)
           commit('setStatus', 'Success')
           commit('setError', null)
-          console.log(response)
         })
         .catch((error) => {
           commit('setStatus', 'Failure')
           commit('setError', error.message)
-          console.log(error)
         })
   },
   logout ( {commit}) {
@@ -92,7 +88,6 @@ export default new Vuex.Store({
       })
   },
   autoLogin({commit}, payload){
-    // console.log('autoLogin')
     commit('setUser', payload)
   },
     
