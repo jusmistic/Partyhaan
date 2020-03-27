@@ -12,7 +12,7 @@
       </v-col>
       <v-spacer></v-spacer>
       <v-col cols="4">
-        <v-btn to='/createParty'>Create'Ty</v-btn>
+        <v-btn to='/create'>Create'Ty</v-btn>
       </v-col>
     </v-row>
   </v-container>
@@ -24,12 +24,13 @@
                  justify="center">
                   <v-spacer></v-spacer>
                   <v-col cols='1'>
-                    /
+                    👑
                   </v-col>
                   <v-col cols="6">
-                    <h3>Title</h3>
+                    <h3>Netflix</h3>
                   </v-col>
                   <v-col cols="4">
+                    ✔
                   </v-col>
                 </v-row>
           </v-card>
