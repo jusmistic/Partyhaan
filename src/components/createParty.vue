@@ -4,7 +4,12 @@
         <v-col cols="12">
         <v-card class='cardItem'>
             <v-card-title>สร้างปาร์ตี้</v-card-title>
-            <v-card-text>
+            <v-card-text v-if="this.partyId != ''">
+                สร้างปาร์ตี้ สำเร็จ
+                <br> Party Id : {{this.partyId}}
+                
+            </v-card-text>
+            <v-card-text v-else>
                 <v-form
                     ref="form"
                     v-model="valid"
@@ -36,11 +41,13 @@
                     ></v-text-field>
                     <v-btn
                         color="success"
+                        @click='create'
                     >
                     สร้าง
                     </v-btn>
                 </v-form>
             </v-card-text>
+
         </v-card>
     </v-col>
     </v-row>
@@ -48,6 +55,7 @@
 </template>
 
 <script>
+
 export default {
     data() {
         return {
@@ -55,9 +63,40 @@ export default {
             partyName:'',
             money:0,
             promptpay:'',
-            payDate:''
+            payDate:'',
+            partyId:''
+
         }
     },
+    methods:{
+
+        create(){
+            let party = {}
+            party.name = this.partyName
+            party.money = this.money
+            party.promptpay = this.promptpay
+            party.payDate = this.payDate
+            party.ownerId = this.$store.getters.user.uid
+            party.member = []
+            party.member.push({'id':this.$store.getters.user.uid, 'paymentStatus':true})
+            
+            this.$store.dispatch('createParty', party)
+
+            //set party id
+            if(this.$store.getters.resParty != ''){
+                // console.log(this.$store.getters.resParty.id)
+                this.partyId = this.$store.getters.resParty.id
+                setTimeout(() => {
+                    this.$store.commit('SetResParty', null)
+                    this.$router.push('/dashboard')
+                }, 3000)
+            }
+
+        }
+    },
+
+
+
 }
 </script>
 

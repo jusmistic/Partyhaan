@@ -14,6 +14,7 @@ export default new Vuex.Store({
     status:null,
     error: null,
     name: null,
+    resParty: null,
   },
   mutations: {
     setUser(state, user){
@@ -28,6 +29,9 @@ export default new Vuex.Store({
     setError(state, payload){
       state.error = payload
     },
+    setResParty(state, payload){
+      state.resParty = payload
+    }
   },
   actions: {
 
@@ -89,7 +93,26 @@ export default new Vuex.Store({
   },
   autoLogin({commit}, payload){
     commit('setUser', payload)
+    
   },
+
+  // Create Party
+  createParty({commit}, payload){
+    commit('setStatus', 'Start Create party')
+    console.log('sending')
+    db.collection('party')
+    .add(payload)
+    .then((res)=>{
+      commit('setStatus', 'Create Party Success')
+      commit('setError', null)
+      // Set Respone Party to resParty
+      commit('setResParty', res)
+      
+    })
+    .catch(error => console.error("Error adding document: ", error))
+
+
+  }
     
   },
   getters:{
@@ -104,6 +127,9 @@ export default new Vuex.Store({
     },
     name(state){
       return state.name
+    },
+    resParty(state){
+      return state.resParty
     }
   },
   modules: {
