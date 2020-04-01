@@ -107,7 +107,6 @@ export default new Vuex.Store({
   // Create Party
   createParty({commit}, payload){
     commit('setStatus', 'Start Create party')
-    console.log('sending')
     db.collection('party')
     .add(payload)
     .then((res)=>{
