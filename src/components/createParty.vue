@@ -1,12 +1,12 @@
 <template>
-<v-container>
+<v-container v-bind:is="party">
     <v-row dense>
         <v-col cols="12">
         <v-card class='cardItem'>
             <v-card-title>สร้างปาร์ตี้</v-card-title>
-            <v-card-text v-if="this.partyId != ''">
+            <v-card-text v-if="partyId != ''">
                 สร้างปาร์ตี้ สำเร็จ
-                <br> Party Id : {{this.partyId}}
+                <br> Party Id : {{partyId}}
                 
             </v-card-text>
             <v-card-text v-else>
@@ -77,8 +77,8 @@ export default {
             party.promptpay = this.promptpay
             party.payDate = this.payDate
             party.ownerId = this.$store.getters.user.uid
-            party.member = []
-            party.member.push({'id':this.$store.getters.user.uid, 'paymentStatus':true})
+            party.members = []
+            party.members.push({'id':this.$store.getters.user.uid, 'paymentStatus':true})
             
             this.$store.dispatch('createParty', party)
 
@@ -87,7 +87,7 @@ export default {
                 // console.log(this.$store.getters.resParty.id)
                 this.partyId = this.$store.getters.resParty.id
                 setTimeout(() => {
-                    this.$store.commit('SetResParty', null)
+                    this.$store.commit('setResParty', null)
                     this.$router.push('/dashboard')
                 }, 3000)
             }
