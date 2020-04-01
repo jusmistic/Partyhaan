@@ -1,12 +1,12 @@
 <template>
-<v-container v-bind:is="party">
+<v-container>
     <v-row dense>
         <v-col cols="12">
         <v-card class='cardItem'>
             <v-card-title>สร้างปาร์ตี้</v-card-title>
-            <v-card-text v-if="partyId != ''">
-                สร้างปาร์ตี้ สำเร็จ
-                <br> Party Id : {{partyId}}
+            <v-card-text v-if="this.getResParty">
+                สร้างปาร์ตี้ สำเร็จ กำลังกลับไป Dashboard
+                <br> Party Id : {{this.getResParty.id}}
                 
             </v-card-text>
             <v-card-text v-else>
@@ -68,6 +68,11 @@ export default {
 
         }
     },
+    computed: {
+        getResParty(){
+            return this.$store.getters.resParty
+        }
+    },
     methods:{
 
         create(){
@@ -81,16 +86,16 @@ export default {
             party.members.push({'id':this.$store.getters.user.uid,'name':this.$store.getters.user.displayName ,'paymentStatus':true})
             
             this.$store.dispatch('createParty', party)
-
-            //set party id
-            if(this.$store.getters.resParty != ''){
-                // console.log(this.$store.getters.resParty.id)
-                this.partyId = this.$store.getters.resParty.id
+            .then(()=>{
+                //set party id
                 setTimeout(() => {
-                    this.$store.commit('setResParty', null)
                     this.$router.push('/dashboard')
-                }, 3000)
-            }
+                    this.$store.commit('setResParty', null)
+                }, 2000)
+                
+            })
+
+
 
         }
     },
