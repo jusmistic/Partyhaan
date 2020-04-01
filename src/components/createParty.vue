@@ -78,7 +78,7 @@ export default {
             party.payDate = this.payDate
             party.ownerId = this.$store.getters.user.uid
             party.members = []
-            party.members.push({'id':this.$store.getters.user.uid, 'paymentStatus':true})
+            party.members.push({'id':this.$store.getters.user.uid,'name':this.$store.getters.user.displayName ,'paymentStatus':true})
             
             this.$store.dispatch('createParty', party)
 
