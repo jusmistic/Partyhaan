@@ -19,15 +19,15 @@
   <v-container>
       <v-row dense>
          <v-col cols="12">
-          <v-card class='cardItem' to='/party'>
+          <v-card class='cardItem' :to="'/party/'+party.id" v-for='party in userParty' v-bind:key="party.id">
                 <v-row 
                  justify="center">
                   <v-spacer></v-spacer>
-                  <v-col cols='1'>
+                  <v-col cols='1' v-if="party.ownerId == user.uid">
                     👑
                   </v-col>
                   <v-col cols="6">
-                    <h3>Netflix</h3>
+                    <h3>{{party.name}}</h3>
                   </v-col>
                   <v-col cols="4">
                     ✔
@@ -42,7 +42,6 @@
 
 <script>
 import store from '../store/index'
-
 export default {
   store,
   data() {
@@ -52,10 +51,21 @@ export default {
   computed: {
     user(){
       return this.$store.getters.user
+    },
+    userParty(){
+      return this.$store.getters.userParty
     }
   },
+  methods: {
+    
+  },
   created(){
-    // console.log(this.$store.user)
+    // Get All User's Party
+    this.$store.dispatch('getUserParty')
+      // console.log(this.$store.getters.userParty)
+    
+    
+
   },
 
 }
