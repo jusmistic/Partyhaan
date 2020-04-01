@@ -48,9 +48,14 @@ const routes = [
     name: 'joinParty',
     component: joinParty
   },
+  // {
+  //   path: '/party',
+  //   name: 'party',
+  //   component: party
+  // },
   {
-    path: '/party',
-    name: 'party',
+    path: '/party/:id',
+    name: 'partyPage',
     component: party
   }
 ]

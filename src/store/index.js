@@ -15,6 +15,8 @@ export default new Vuex.Store({
     error: null,
     name: null,
     resParty: null,
+    userParty: null,
+    currentParty: null
   },
   mutations: {
     setUser(state, user){
@@ -31,6 +33,12 @@ export default new Vuex.Store({
     },
     setResParty(state, payload){
       state.resParty = payload
+    },
+    setUserParty(state, payload){
+      state.userParty = payload
+    },
+    setCurrentParty(state, payload){
+      state.currentParty = payload
     }
   },
   actions: {
@@ -51,7 +59,7 @@ export default new Vuex.Store({
       commit('setStatus', 'Loading')
       db.collection('users')
       .doc(user.uid)
-      .set({'uid':user.uid,'partys':[]})
+      .set({'uid':user.uid,'name':payload.name})
       .then(() => {
         commit('setStatus', 'User updated in firestore')
         commit('setError', null)      })
@@ -110,8 +118,42 @@ export default new Vuex.Store({
       
     })
     .catch(error => console.error("Error adding document: ", error))
+  },
 
+  getUserParty({commit}){
+    commit('setStatus', 'Start Get User Party')
+    db.collection('party')
+    .where('ownerId','==',this.getters.user.uid)
+    .get()
+    .then((res)=>{
+      commit('setStatus', 'Query User Party Complete')
+      let partys = []
+      res.forEach((docs)=>{
+        let party = docs.data()
+        party.id = docs.id
+        partys.push(party)
+      })
+      
+      commit('setUserParty', partys)
+    })
+    .catch((err)=>{
+      commit('setError', err)
+    })
+  },
 
+  getPartyById({commit}, partyId){
+    commit('setStatus', 'Get party by id')
+    db.collection('party')
+    .doc(partyId)
+    .get()
+    .then((doc)=>{
+      commit('setCurrentParty',doc.data())
+      commit('setStatus', 'Get party by ID complete')
+      commit('setError', null)
+    })
+    .catch((err)=>{
+      commit('setError', err)
+    })
   }
     
   },
@@ -130,6 +172,12 @@ export default new Vuex.Store({
     },
     resParty(state){
       return state.resParty
+    },
+    userParty(state){
+      return state.userParty
+    },
+    currentParty(state){
+      return state.currentParty
     }
   },
   modules: {
