@@ -109,10 +109,11 @@ methods:{
     validate () {
         if (this.$refs.form.validate()) {
             this.snackbar = true
-           const user = {
+            const user = {
             email: this.email,
             password: this.password,
-            name: this.name
+            name: this.name,
+            party: []
         }
  
             this.$store.dispatch('register', user)

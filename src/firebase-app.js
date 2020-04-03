@@ -16,3 +16,4 @@ var config = {
 export const firebaseApp = firebase.initializeApp(config)
 export const firebaseAuth = firebase.auth
 export const firebaseDb = firebase.firestore()
+export const firebaseDbVar = firebase.firestore

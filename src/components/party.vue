@@ -25,9 +25,9 @@
       </div>
       <br />
 
-      <div id="memberListSection">
+      <div id="memberListSection" v-if="party">
         <h3>สมาชิกในปาร์ตี้</h3>
-        <v-row dense v-for="member in party.members" :key='member'>
+        <v-row dense v-for="member in party.members" :key='member.id'>
           <v-col cols="12">
             <v-card class="cardItem">
               <v-row justify="center">
@@ -63,15 +63,14 @@ export default {
       return this.$store.getters.currentParty;
     },
     payStatus() {
-      let members = this.$store.getters.currentParty.members;
-      let msg = "Error";
-      members.forEach(member => {
-        if (member.id == this.$store.getters.user.uid) {
-          msg = member.paymentStatus;
-          return msg;
-        }
+      let msg ='Not found'
+      this.party.members.forEach( member => {
+        if(this.$store.getters.user.uid == member.id){
+          msg = member.paymentStatus
+          return msg
+        }        
       });
-      return msg;
+      return msg
     },
 
   }
