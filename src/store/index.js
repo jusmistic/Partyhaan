@@ -152,29 +152,7 @@ export default new Vuex.Store({
       commit('setError', err)
 
     }
-    // db.collection('party')
-    // .doc(partyId)
-    // .get()
-    // .then((res)=>{
-    //   res.data().members.forEach(user => {
-    //     if(user.id == this.getters.user.uid){
-    //       commit('setError','userExist')
-    //       console.log(this.getters.error)
-    //     } else{
-    //       db.collection('party')
-    //       .doc(partyId)
-    //       .update(
-    //         {
-    //         members: fbVar.FieldValue.arrayUnion({'id':this.getters.user.uid,'name':this.getters.user.displayName ,'paymentStatus':false})
-    //         }
-    //         ).then(()=>{
-    //           commit('setStatus', 'joinComplete')
-    //         })
 
-  
-    //     }
-    //   })
-    //  })
   },
 
   // Create Party
@@ -197,25 +175,7 @@ export default new Vuex.Store({
     } catch(err){
       commit('setError', err)
     }
-    // .then((res)=>{
-    //   console.log(members)
-    //   db
-    //   .collection('party')
-    //   .doc(res.id)
-    //   .collection('members')
-    //   .doc()
-    //   .set(members)
-    //   .then(res=>{
-    //     console.log(res.id)
-    //   })
-      // .then((res)=>{
-      //   // commit('setStatus', 'Create Party Success')
-      //   // commit('setError', null)
-      //   // // Set Respone Party to resParty
-      //   // commit('setResParty', res)
-      // })     
-    // })
-    // .catch(error => console.error("Error adding document: ", error))
+ 
   },
 
   getUserParty({commit}){
@@ -239,25 +199,7 @@ export default new Vuex.Store({
         commit('setStatus', 'Query User Party Complete')
         commit('setUserParty', partyList)
     })
-    // db.collectionGroup('members')
-    // .where('id','==',this.getters.user.uid)
-    // .get()
-    // .then((querySnapshot)=>{
-    //   commit('setStatus', 'Query User Party Complete')
-    //   let partys = []
-    //   console.log(querySnapshot)
-    //   querySnapshot.forEach((doc)=>{
-    //     let party = doc.getParent().data()
-    //     console.log(party)
-    //     party.id = doc.id
-    //     partys.push(party)
-    //   })
-      
-    //   commit('setUserParty', partys)
-    // })
-    // .catch((err)=>{
-    //   commit('setError', err)
-    // })
+    
   },
 
   getPartyById({commit}, partyId){
@@ -286,6 +228,77 @@ export default new Vuex.Store({
     .catch((err)=>{
       commit('setError', err)
     })
+  },
+  setPaymentStatus({commit}, payload){
+    commit('setStatus', 'Set paymentStatus')
+    let memberId = payload.memberId
+    let status = payload.status
+    let partyId = payload.partyId
+    db.collection('party')
+      .doc(partyId)
+      .collection('members')
+      .where('id', '==', memberId)
+      .get()
+      .then(docRef =>{
+        //always has 1 doc
+        docRef.forEach(doc =>{
+          // console.log(doc.ref.id)
+          db.collection('party')
+            .doc(partyId)
+            .collection('members')
+            .doc(doc.ref.id) //ref to this doc
+            .update({
+              paymentStatus: status
+            })
+            .catch(err => {
+              commit('setError', err)
+            })
+        })
+      })
+      .then(()=>{
+        commit('setStatus', 'Set paymentStatus complete')
+      })
+      .catch(err => {
+        commit('setError', err)
+      })
+
+  },
+
+  removeMember({commit}, payload){
+    commit('setStatus', 'Remove Member from party')
+    let memberId = payload.memberId
+    let partyId = payload.partyId 
+    db.collection('party')
+      .doc(partyId)
+      .collection('members')
+      .where('id', '==', memberId)
+      .get()
+      .then((docRef)=>{
+        docRef.forEach(doc => {
+          //remove member
+          db.collection('party')
+            .doc(partyId)
+            .collection('members')
+            .doc(doc.ref.id)
+            .delete()
+            .then(()=>{
+              commit('setStatus', 'Removed from party')
+              db.collection('users')
+                .doc(memberId)
+                .update({
+                  party: fbVar.FieldValue.arrayRemove(partyId)
+                })
+                .then(()=>{
+                  commit('setStatus', 'Removed from user')
+                })
+                .catch(err=>{commit('setError', err)})
+            })
+            .catch(err=>{commit('setError', err)})
+          
+          
+        })
+      })
+      .catch(err=>{ commit('setError',err)})
   }
     
   },
