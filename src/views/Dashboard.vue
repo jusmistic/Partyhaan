@@ -62,11 +62,17 @@ export default {
   created(){
     // Get All User's Party
     this.$store.dispatch('getUserParty')
-      // console.log(this.$store.getters.userParty)
+    //
+    console.log('created')
+    console.log(this.$store.getters.userParty)
     
     
 
   },
+  mounted(){
+    this.$store.dispatch('getUserParty')
+
+  }
 
 }
 </script>

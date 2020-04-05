@@ -291,16 +291,31 @@ export default new Vuex.Store({
                 .then(()=>{
                   commit('setStatus', 'Removed from user')
                 })
-                .catch(err=>{commit('setError', err)})
+                .catch(err=>{
+                  commit('setError', err)
+                  })
             })
-            .catch(err=>{commit('setError', err)})
+            .catch(err=>{
+              commit('setError', err)
+            })
           
           
         })
       })
       .catch(err=>{ commit('setError',err)})
-  }
-    
+  },
+  deleteParty({commit}, partyId){
+    commit('setStatus', 'Deleting Party'+partyId)
+    db.collection('party')
+      .doc(partyId)
+      .delete()
+      .then(()=>{
+        commit('setStatus', 'Deleted Party '+partyId)
+        commit('setStatus', 'Deleted Party '+partyId)
+      })
+      .catch(err=>commit('setError', err))
+  },
+
   },
   getters:{
     status(state){

@@ -71,7 +71,8 @@ router.beforeEach((to, from, next) => {
      store.getters.user
   ){
     return next()
-  } else{
+  }
+  else{
     router.push({path:"/login", query:{to: to.path}});
   }
 })

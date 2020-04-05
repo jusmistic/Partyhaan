@@ -9,8 +9,6 @@
               <p>
                 สถานะของคุณ: {{payStatus}}
                 <br />
-                วันที่ต้องจ่าย:{{party.payDate}}
-                <br />
                 หมายเลขพร้อมเพย์:{{party.promptpay}}
                 <br />
                 เงินที่ต้องเก็บต่อเดือน: {{party.money}}
@@ -18,7 +16,7 @@
             </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="red darken-1" v-if="!isOwner">
+              <v-btn color="red darken-1" v-if="!isOwner" @click="leaveParty(thisUser.uid, $route.params.id)">
                   ออกจากตี้
               </v-btn>
             </v-card-actions>
@@ -34,8 +32,12 @@
             <v-card v-if="isOwner">
               <v-card-title>Admin section</v-card-title>
               <v-card-text>
-                <v-btn color="red darken-1" >
+                <v-btn color="red darken-1"  class="ma-2" @click="deleteParty">
                   ปิดปาร์ตี้
+                </v-btn>
+                
+                 <v-btn color="" class="ma-2" @click="resetPaymentParty">
+                  รีเซ็ตการจ่าย
                 </v-btn>
               </v-card-text>
             </v-card>
@@ -59,7 +61,7 @@
                 <v-col cols="2" v-if="member.paymentStatus">✔</v-col>
                 <v-col cols="2" v-else>❌</v-col>
                 <v-col cols="2">
-                  <v-menu offset-y v-if="member.id != party.ownerId">
+                  <v-menu offset-y v-if="member.id != party.ownerId && isOwner">
                     <template v-slot:activator="{ on }">
                       <v-btn
                       icon
@@ -129,18 +131,61 @@ export default {
         this.$store.dispatch("getPartyById", this.$route.params.id);
       })
     },
-    removeMember(memberId,partyId){
+    async removeMember(memberId,partyId){
       let payload = {}
       payload.memberId = memberId
       payload.partyId = partyId
-      this.$store.dispatch('removeMember', payload)
+      this.$store.dispatch('removeMember', payload).then(()=>{
+        this.$store.dispatch("getPartyById", this.$route.params.id);
+
+      })
       //trigger Update Party Data
-      this.$store.dispatch("getPartyById", this.$route.params.id);
       // console.log(memberId, partyId)
       //todo
+    },
+    leaveParty(memberId, partyId){
+      let payload = {}
+      payload.memberId = memberId
+      payload.partyId = partyId
+      this.$store.dispatch('removeMember', payload).then(
+        ()=>{
+          this.$store.dispatch("getPartyById", this.$route.params.id)
+            .then(()=>{
+              this.$router.push('/dashboard')
+          })
+        }
+      )
+      //trigger Update Party Data
+    },
+    async asyncForEachMember(party, callback){
+      for (let i = 0 ; i< party.members.length; i++){
+        await callback(party.members[i].id)
+      }
+    },
+    async deleteParty(){
+      // remove party from all members
+      // const waitFor = (ms) => new Promise(r => setTimeout(r, ms));
+      await this.asyncForEachMember(this.party, async (member)=>{
+        // await waitFor(50)
+        await this.removeMember(member, this.$route.params.id)
+      })
+      this.$store.dispatch('deleteParty', this.$route.params.id)
+      this.$router.push('/dashboard')
+    },
+    
+    async resetPaymentParty(){
+        this.party.members.forEach(member=>{
+        if(this.party.ownerId != member.id){
+          this.setPaymenet(false, member.id, this.$route.params.id)
+        }
+      })
+      
     }
   },
   computed: {
+    thisUser(){
+      return this.$store.getters.user
+    },
     party(){
       return this.$store.getters.currentParty;
     },
@@ -153,6 +198,7 @@ export default {
 
     payStatus() {
       let msg ='Not found'
+
       this.party.members.forEach( member => {
         if(this.$store.getters.user.uid == member.id){
           msg = member.paymentStatus
