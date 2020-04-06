@@ -116,7 +116,6 @@ export default new Vuex.Store({
         commit('setStatus', 'Add Party to user completed')
       }
     } catch(err){
-      console.log(err)
       commit('setError', err)
     }
   },
@@ -133,7 +132,6 @@ export default new Vuex.Store({
       //check if user is already in this group
       if(!partyRef.empty){
         commit('setError','userExist')
-        console.log(this.getters.error)
       } else{ //user not in group
         //add this user to party members collection
         const memberRef = await db.collection('party')
