@@ -33,12 +33,6 @@
                         label="หมายเลขพร้อมเพย์"
                         required
                     ></v-text-field>
-                    <v-text-field
-                        color='deep-purple'
-                        v-model="payDate"
-                        label="เก็บเงินทุกวันที่"
-                        required
-                    ></v-text-field>
                     <v-btn
                         color="success"
                         @click='create'
@@ -82,7 +76,6 @@ export default {
             party.name = this.partyName
             party.money = this.money
             party.promptpay = this.promptpay
-            party.payDate = this.payDate
             party.ownerId = this.$store.getters.user.uid
             let members = {'id':this.$store.getters.user.uid,'name':this.$store.getters.user.displayName ,'paymentStatus':true}
             let payload ={}

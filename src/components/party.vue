@@ -7,9 +7,31 @@
             <v-card-title>{{party.name}}</v-card-title>
             <v-card-text>
               <p>
+                <input type="hidden" id="party-id" :value="this.getPartyId()">
+                หมายเลขปาร์ตี้: {{$route.params.id}}
+                <v-btn
+                      icon
+                      fab
+                      x-small
+                      elevation='1'
+                      @click="copyParty"
+                      >
+                      <v-icon  color="black">mdi-clipboard-outline</v-icon>
+                </v-btn>
+                <br>
                 สถานะของคุณ: {{payStatus}}
                 <br />
+                <input type="hidden" id="promptpay-val" :value="this.party.promptpay">
                 หมายเลขพร้อมเพย์:{{party.promptpay}}
+                <v-btn
+                      icon
+                      fab
+                      x-small
+                      elevation='1'
+                      @click="copyPromptpay"
+                      >
+                      <v-icon  color="black">mdi-clipboard-outline</v-icon>
+                </v-btn>
                 <br />
                 เงินที่ต้องเก็บต่อเดือน: {{party.money}}
               </p>
@@ -119,6 +141,30 @@ export default {
     };
   },
   methods: {
+
+    copyPromptpay(){
+      let copyText = document.querySelector('#promptpay-val')
+      copyText.setAttribute('type', 'text')    
+      copyText.select()
+      copyText.setSelectionRange(0, 99999);
+      try {
+            var successful = document.execCommand('copy');
+            var msg = successful ? 'successful' : 'unsuccessful';
+            this.$store.commit('setStatus', msg)
+          } catch (err) {
+            this.$store.commit('setError', err)
+          }
+      copyText.setAttribute('type', 'hidden')
+      window.getSelection().removeAllRanges()
+    },
+    copyParty(){
+      let copyText = document.querySelector('#party-id')
+      copyText.setAttribute('type', 'text')    
+      copyText.select()
+      copyText.setSelectionRange(0, 99999);
+      copyText.setAttribute('type', 'hidden')
+      window.getSelection().removeAllRanges()
+    },
     setPaymenet(status, memberId, partyId){
       let payload = {}
       payload.status = status
@@ -180,6 +226,9 @@ export default {
         }
       })
       
+    },
+    getPartyId(){
+      return this.$route.params.id
     }
   },
   computed: {
@@ -201,12 +250,17 @@ export default {
 
       this.party.members.forEach( member => {
         if(this.$store.getters.user.uid == member.id){
-          msg = member.paymentStatus
+          if(member.paymentStatus){
+          msg = 'จ่ายแล้ว'
+          } else{
+            msg = 'ยังไม่จ่าย'
+          }
           return msg
         }        
       });
       return msg
     },
+    
 
   }
 };
